@@ -1,4 +1,3 @@
-````markdown
 # 🗓️ Gestão de Eventos
 
 Sistema simples de gerenciamento de eventos desenvolvido com **Python**, **FastAPI**, **MongoDB**, e **HTML/CSS/JS puro**.
