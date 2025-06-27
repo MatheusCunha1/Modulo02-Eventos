@@ -103,8 +103,6 @@ cd Modulo02-Eventos
 pip install -r requirements.txt
 
 No diretório raiz do projeto, execute:
-
-```bash
 docker-compose build
 docker-compose up
 ```
