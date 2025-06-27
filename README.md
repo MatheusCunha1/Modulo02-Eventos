@@ -101,7 +101,12 @@ Content-Type: application/json
 git clone https://github.com/MatheusCunha1/Modulo02-Eventos.git
 cd Modulo02-Eventos
 pip install -r requirements.txt
-uvicorn app.main:app --reload
+
+No diretório raiz do projeto, execute:
+
+```bash
+docker-compose build
+docker-compose up
 ```
 
 ---
