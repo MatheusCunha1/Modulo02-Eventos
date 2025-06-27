@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Eventos Disponíveis</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background: #f9f9f9;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+
+    form {
+      max-width: 600px;
+      margin: 0 auto 40px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.05);
+    }
+
+    form input, form textarea {
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    form button {
+      background: #27ae60;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    form button:hover {
+      background: #219150;
+    }
+
+    #eventos {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+      width: 280px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      background-color: #eee;
+    }
+
+    .card-content {
+      padding: 15px;
+    }
+
+    .card-content h3 {
+      margin: 0 0 10px;
+      color: #333;
+    }
+
+    .card-content p {
+      margin: 5px 0;
+      color: #666;
+    }
+
+    .card-content button {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: #e74c3c;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .card-content button:hover {
+      background: #c0392b;
+    }
+  </style>
+</head>
+<body>
+
+  <h1 id="form-title">Cadastro de Evento</h1>
+  <form onsubmit="enviarFormulario(); return false;">
+    <input type="hidden" id="eventoId">
+    <input type="text" id="titulo" placeholder="Título" required>
+    <textarea id="descricao" placeholder="Descrição" required></textarea>
+    <input type="date" id="data" required>
+    <input type="text" id="local" placeholder="Local" required>
+    <button type="submit" id="form-btn">Criar Evento</button>
+  </form>
+
+  <h1>Eventos Disponíveis</h1>
+  <div id="eventos">Carregando...</div>
+
+  <script>
+    const apiUrl = "http://localhost:8000/eventos/";
+
+    async function listarEventos() {
+      const container = document.getElementById("eventos");
+      container.innerHTML = "Carregando...";
+
+      try {
+        const res = await fetch(apiUrl);
+        const eventos = await res.json();
+        container.innerHTML = "";
+
+        if (!Array.isArray(eventos) || eventos.length === 0) {
+          container.innerHTML = "<p>Nenhum evento disponível.</p>";
+          return;
+        }
+
+        eventos.forEach(e => {
+          const div = document.createElement("div");
+          div.className = "card";
+          div.innerHTML = `
+            <img src="https://projetosespeciais.com/wp-content/uploads/2019/04/Evento-Corporativo.jpg" alt="Imagem do Evento">
+            <div class="card-content">
+              <h3>${e.titulo}</h3>
+              <p>${e.descricao}</p>
+              <p><strong>Data:</strong> ${e.data}</p>
+              <p><strong>Local:</strong> ${e.local}</p>
+              <button onclick="editarEvento('${e._id}', '${e.titulo}', '${e.descricao}', '${e.data}', '${e.local}')">Atualizar</button>
+              <button onclick="removerEvento('${e._id}')">Remover</button>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+
+      } catch (err) {
+        container.innerHTML = "<p>Erro ao carregar eventos.</p>";
+        console.error("Erro:", err);
+      }
+    }
+
+    async function enviarFormulario() {
+      const eventoId = document.getElementById("eventoId").value;
+      const titulo = document.getElementById("titulo").value;
+      const descricao = document.getElementById("descricao").value;
+      const data = document.getElementById("data").value;
+      const local = document.getElementById("local").value;
+
+      const evento = {
+        titulo,
+        descricao,
+        data,
+        local,
+        imagem: `https://projetosespeciais.com/wp-content/uploads/2019/04/Evento-Corporativo.jpg`
+      };
+
+      try {
+        if (eventoId) {
+          // Atualizar evento
+          const res = await fetch(apiUrl + eventoId, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(evento)
+          });
+          await res.json();
+          alert("Evento atualizado com sucesso!");
+        } else {
+          // Criar novo evento
+          const res = await fetch(apiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(evento)
+          });
+          await res.json();
+          alert("Evento criado com sucesso!");
+        }
+
+        document.querySelector("form").reset();
+        document.getElementById("eventoId").value = "";
+        document.getElementById("form-title").textContent = "Cadastro de Evento";
+        document.getElementById("form-btn").textContent = "Criar Evento";
+        listarEventos();
+
+      } catch (err) {
+        alert("Erro ao salvar evento.");
+        console.error("Erro:", err);
+      }
+    }
+
+    function editarEvento(id, titulo, descricao, data, local) {
+      document.getElementById("eventoId").value = id;
+      document.getElementById("titulo").value = titulo;
+      document.getElementById("descricao").value = descricao;
+      document.getElementById("data").value = data;
+      document.getElementById("local").value = local;
+      document.getElementById("form-title").textContent = "Atualizar Evento";
+      document.getElementById("form-btn").textContent = "Salvar Alterações";
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function removerEvento(id) {
+      const confirmado = confirm("Tem certeza que deseja excluir este evento?");
+      if (!confirmado) return;
+
+      try {
+        const res = await fetch(apiUrl + id, {
+          method: "DELETE"
+        });
+
+        await res.json();
+        alert("Evento removido!");
+        listarEventos();
+
+      } catch (err) {
+        alert("Erro ao remover evento.");
+        console.error("Erro:", err);
+      }
+    }
+
+    window.onload = listarEventos;
+  </script>
+</body>
+</html>

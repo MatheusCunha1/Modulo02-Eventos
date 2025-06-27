@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard de Eventos</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="tela">
+    <h1>Dashboard de Eventos</h1>
+
+    <section>
+      <h3>Criar Novo Evento</h3>
+      <input type="text" id="titulo" placeholder="Título">
+      <input type="text" id="descricao" placeholder="Descrição">
+      <input type="date" id="data">
+      <input type="text" id="local" placeholder="Local">
+      <button onclick="criarEvento()">Criar Evento</button>
+    </section>
+
+    <hr>
+
+    <section>
+      <h3>Lista de Eventos</h3>
+      <button onclick="listarEventos()">Atualizar Lista</button>
+      <div id="eventos"></div>
+    </section>
+  </div>
+
+  <script src="script-dashboard.js"></script>
+</body>
+</html>
